@@ -4,6 +4,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.StructType;
@@ -31,7 +32,8 @@ public class DatasetApplication {
 				  .getOrCreate();
 		
 		//example1ReadTxtFile(spark);
-		example1ReadJson(spark);
+		//example1ReadJson(spark);
+		example2(spark);
 
 	}
 		
@@ -60,17 +62,32 @@ public class DatasetApplication {
 		
 	}
 
+	
+	
+	// https://stackoverflow.com/questions/41944689/pyspark-parse-fixed-width-text-file
+	// how to handle the fixed length format 
+	
+	
 	public static void example1ReadJson(SparkSession spark){
 		
 		Dataset<Row> df = spark.read().json("src/main/resources/data/people.json");
 
+	
 		df.show();
 		
 		df.printSchema();
 
 		df.select("name").show();
 		df.select(col("name"), col("age").plus(1)).show();
-	    
+		df.filter(col("age").gt(21)).show();
+		
+		
+
+		// Register the DataFrame as a SQL temporary view
+		df.createOrReplaceTempView("people");
+
+		Dataset<Row> sqlDF = spark.sql("SELECT * FROM people");
+		sqlDF.show();
 		
 	    spark.stop();
 	
@@ -78,6 +95,42 @@ public class DatasetApplication {
 	    System.out.println("end of the application ");
 		
 	}
+	
+	
+	
+	
+	public static void example2(SparkSession spark){
+		
+		
+
+		Dataset<Row> aDf = spark.read().text("src/main/resources/data/compare/a.txt");
+		//aDf.show();
+		
+		Dataset<Row> bDf = spark.read().text("src/main/resources/data/compare/b.txt");
+		//bDf.show();
+		//Dataset<Row> result = aDf.except(bDf).union(bDf.except(aDf));
+		
+		//result.show();
+		
+	
+
+		
+		
+		Dataset<Row> result1 = aDf.except(bDf);
+		Dataset<Row> result2 = bDf.except(aDf);
+		
+		System.out.println("************************** 1");
+		
+		//result1.show();
+		System.out.println("########################## 2");
+		
+		//result2.show();
+		System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxx");
+		
+	}
+	
+	
+	
 
 	
 }
