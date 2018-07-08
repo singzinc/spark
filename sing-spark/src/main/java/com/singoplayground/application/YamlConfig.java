@@ -32,7 +32,7 @@ public class YamlConfig {
 	            // TODO Auto-generated catch block
 	            e.printStackTrace();
 	        }
-
+			
 	}
 
 }
