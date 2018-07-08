@@ -27,12 +27,24 @@ public class SqlExample {
 		
 		
 		result1 = result1.withColumn("test",result1.col("value").substr(0, 5));
-		
 		result1 = result1.withColumn("test2",result1.col("value").substr(5, 5)); 
 		
+		result2 = result2.withColumn("test",result2.col("value").substr(0, 5));
+		result2 = result2.withColumn("test2",result2.col("value").substr(5, 5)); 
+		
 		result1.show();
-		
-		
+		result2.show();
+		try{
+			result1.createTempView("result1_view");
+			result2.createTempView("result2_view");
+			
+			Dataset<Row> sqlDF = spark.sql("SELECT * FROM result1_view v1 full outer join result2_view v2 on v1.test = v2.test" );
+			sqlDF.show();
+			
+			
+		}catch(Exception e){
+			
+		}
 		
 		System.out.println("------ End ---------");
 		spark.close();
